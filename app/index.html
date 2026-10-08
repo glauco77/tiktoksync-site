@@ -33,6 +33,9 @@
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
   html,body{margin:0; width:100%; max-width:100%; -webkit-text-size-adjust:100%}
+  /* iPhone: reserva o espaço da barra de status; o topo fixo então nasce na posição certa. */
+  body::before{content:""; position:fixed; top:0; left:0; right:0; height:env(safe-area-inset-top,0px); background:var(--bg); z-index:11}
+  body{padding-top:env(safe-area-inset-top,0px)!important}
   body{background:var(--bg); color:var(--ink);
     font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     padding-inline:16px; padding-block:0 120px; min-height:100%;}
