@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Prontos TikTok</title>
 <meta name="theme-color" content="#12151c">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,27 +32,29 @@
     color-scheme: dark;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-  html,body{margin:0}
+  html,body{margin:0; width:100%; max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%}
   body{background:var(--bg); color:var(--ink);
     font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     padding-inline:16px; padding-block:0 120px; min-height:100%;}
   button,input,select{font:inherit; color:inherit}
   button{cursor:pointer}
-  .wrap{max-width:720px; margin:0 auto}
+  .wrap{width:100%; max-width:720px; margin:0 auto; min-width:0}
+  .wrap *{min-width:0}
 
   /* Header */
   header{position:sticky; top:env(safe-area-inset-top,0px); z-index:10; background:var(--bg);
     padding-block:12px 8px; display:flex; flex-direction:column; gap:10px}
-  .title-row{display:flex; align-items:center; gap:10px}
+  .title-row{display:grid; grid-template-columns:34px minmax(0,1fr) auto auto auto; align-items:center; gap:8px}
   .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--accent));
     display:grid;place-items:center;color:#fff;font-weight:700}
   h1{font-size:1.15rem; margin:0; flex:1; letter-spacing:-.01em}
-  .icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);
-    display:grid;place-items:center;font-size:18px}
+  .icon-btn{width:42px;height:42px;border-radius:12px;border:0;background:var(--ink);color:var(--bg);
+    display:grid;place-items:center;padding:0}
+  .icon-btn svg{width:24px;height:24px;display:block}
   .icon-btn:active{transform:scale(.96)}
-  .tools{display:flex; gap:8px}
-  .tools input[type=search]{flex:1; min-width:0; padding:9px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface)}
-  .tools select{padding:9px 8px; border-radius:12px; border:1px solid var(--line); background:var(--surface)}
+  .tools{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px}
+  .tools input[type=search]{width:100%; min-width:0; font-size:16px; padding:9px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface)}
+  .tools select{max-width:150px; font-size:16px; padding:9px 8px; border-radius:12px; border:1px solid var(--line); background:var(--surface)}
   .chips{display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:.85rem; color:var(--soft)}
   .chip{border:1px solid var(--line); background:var(--surface); padding:6px 11px; border-radius:99px; font-size:.85rem}
   .chip.on{background:var(--teal-soft); border-color:transparent; color:var(--teal)}
@@ -60,8 +62,8 @@
 
   /* Cards */
   .list{display:flex; flex-direction:column; gap:10px; margin-top:6px}
-  .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:12px 12px 12px; box-shadow:var(--shadow)}
-  .card.sel{border-color:var(--teal)}
+  .card{min-width:0; max-width:100%; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:12px 12px 12px; box-shadow:var(--shadow)}
+  .card.sel{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
   .card.empty{opacity:.55}
   .head{display:flex; align-items:center; gap:12px; width:100%; background:none; border:0; padding:0; text-align:left}
   .folder{position:relative; width:52px; height:44px; flex:0 0 auto}
@@ -73,15 +75,18 @@
   .chev{color:var(--soft); transition:transform .15s}
   .card.open .chev{transform:rotate(90deg)}
   .acts{display:flex; align-items:center; gap:6px; margin-top:12px; flex-wrap:wrap; justify-content:flex-end}
-  .qty{width:54px; text-align:center; font-weight:700; font-size:1.05rem; padding:8px 4px; border-radius:11px;
-    border:1.5px solid var(--line); background:var(--surface-2)}
+  .qty{width:54px; text-align:center; font-weight:800; font-size:17px; padding:8px 4px; border-radius:11px;
+    border:2px solid var(--soft); background:var(--surface-2)}
+  .qty.has{border-color:var(--accent); color:var(--accent); background:var(--surface)}
   .qty:focus{outline:2px solid var(--teal); outline-offset:1px}
-  .qb{min-width:44px; height:40px; padding:0 10px; border-radius:11px; border:1.5px solid var(--line);
-    background:var(--surface); font-weight:700}
-  .qb.on{background:var(--teal); border-color:var(--teal); color:#04201e}
-  .qb:disabled{opacity:.35}
-  .qb.plus{background:var(--teal-soft); border-color:transparent; color:var(--teal)}
-  .qb.clear{color:var(--soft); min-width:38px}
+  .qb{min-width:42px; height:42px; padding:0 10px; border-radius:12px; border:2px solid var(--soft);
+    background:var(--surface); color:var(--ink); font-weight:800; font-size:17px}
+  .qb:active{transform:scale(.94)}
+  .qb.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); transform:scale(1.07);
+    box-shadow:0 3px 10px rgba(232,38,79,.38)}
+  .qb:disabled{opacity:.3; border-color:var(--line)}
+  .qb.plus{background:var(--teal-soft); border-color:var(--teal); color:var(--teal); font-size:22px; line-height:1}
+  .qb.clear{color:var(--soft); border-color:var(--line); min-width:38px; font-weight:600}
   .hint{font-size:.78rem; color:var(--soft); margin-right:auto}
   .hint button{background:none; border:0; color:var(--teal); font-weight:600; padding:2px 4px}
   .files{display:none; margin-top:10px; border-top:1px solid var(--line); padding-top:8px}
@@ -98,7 +103,7 @@
   /* Bottom bar */
   .bar{position:fixed; inset:auto 0 0 0; z-index:20; background:var(--surface); border-top:1px solid var(--line);
     padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px)); box-shadow:0 -6px 20px rgba(0,0,0,.06)}
-  .bar-in{max-width:720px; margin:0 auto; display:flex; align-items:center; gap:10px}
+  .bar-in{max-width:720px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:10px}
   .bar .info{flex:1; min-width:0; font-size:.9rem; line-height:1.25}
   .bar .info small{display:block; color:var(--soft)}
   .btn{border:0; border-radius:14px; padding:13px 18px; font-weight:700; background:var(--accent); color:var(--accent-ink)}
@@ -120,7 +125,7 @@
     max-height:88vh; overflow:auto}
   .sheet h2{margin:0 0 4px; font-size:1.1rem}
   .sheet label{display:block; font-size:.82rem; color:var(--soft); margin:12px 0 4px}
-  .sheet input[type=text],.sheet input[type=password]{width:100%; padding:11px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface-2)}
+  .sheet input[type=text],.sheet input[type=password]{width:100%; font-size:16px; padding:11px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface-2)}
   .sheet .row{display:flex; gap:8px; margin-top:16px; flex-wrap:wrap}
   .sheet .row .btn{flex:1}
   .prog{height:10px; border-radius:99px; background:var(--surface-2); overflow:hidden; margin:10px 0}
@@ -146,14 +151,14 @@
       <div class="logo">▶</div>
       <h1>Vídeos prontos</h1>
       <span id="demoTag" class="demo" hidden>MODO DEMONSTRAÇÃO</span>
-      <button class="icon-btn" id="btnRefresh" aria-label="Atualizar">⟳</button>
-      <button class="icon-btn" id="btnMenu" aria-label="Menu">⋯</button>
+      <button class="icon-btn" id="btnRefresh" aria-label="Atualizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg></button>
+      <button class="icon-btn" id="btnMenu" aria-label="Menu"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2.4"/><circle cx="12" cy="12" r="2.4"/><circle cx="19" cy="12" r="2.4"/></svg></button>
     </div>
     <div class="tools">
       <input type="search" id="search" placeholder="Buscar produto…" aria-label="Buscar produto">
       <select id="sort" aria-label="Ordenar">
-        <option value="count">Mais vídeos</option>
         <option value="name">Nome (A–Z)</option>
+        <option value="count">Mais vídeos</option>
         <option value="old">Mais antigo</option>
       </select>
     </div>
@@ -193,7 +198,7 @@
 'use strict';
 
 /* ====================== Config ====================== */
-var LS_CFG='ptk_cfg_v1', LS_UI='ptk_ui_v1', LS_LAST='ptk_last_v1';
+var LS_CFG='ptk_cfg_v1', LS_UI='ptk_ui_v2', LS_LAST='ptk_last_v1';
 var FOLDER='application/vnd.google-apps.folder';
 var BATCH_BYTES=220*1024*1024, BATCH_MAX=8;
 var DEMO=/[?&]demo=1/.test(location.search);
@@ -204,7 +209,7 @@ var DEFAULTS={rootId:'0AKjS6CrtHkWuUk9PVA', prontoName:'Prontos', archiveName:'B
 function lsGet(k,d){ try{ var v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 var cfg=Object.assign({},DEFAULTS,lsGet(LS_CFG,{}));
-var ui=Object.assign({sort:'count',hide:true,search:''},lsGet(LS_UI,{}));
+var ui=Object.assign({sort:'name',hide:true,search:''},lsGet(LS_UI,{}));
 var last=lsGet(LS_LAST,{});          // última quantidade por produto
 
 /* ====================== Utilitários ====================== */
@@ -343,7 +348,7 @@ function cardEl(p){
     '<button class="head" data-a="toggle"><span class="folder">'+FOLDER_SVG+'<b>'+n+'</b></span>'+
     '<span class="names"><div class="n">'+esc(p.name)+'</div><div class="s">'+(n===0?'Nenhum vídeo pronto':n+' vídeo'+(n===1?'':'s')+' pronto'+(n===1?'':'s')+' · '+fmtBytes(p.files.reduce(function(s,f){return s+f.size;},0)))+'</div></span><span class="chev">›</span></button>'+
     (n>0?'<div class="acts">'+hint+
-      '<input class="qty" inputmode="numeric" pattern="[0-9]*" value="'+(q||'')+'" placeholder="0" aria-label="Quantidade de '+esc(p.name)+'" data-a="input">'+
+      '<input class="qty'+(q>0?' has':'')+'" inputmode="numeric" pattern="[0-9]*" value="'+(q||'')+'" placeholder="0" aria-label="Quantidade de '+esc(p.name)+'" data-a="input">'+
       btns+'<button class="qb plus" data-a="plus" aria-label="Mais um">＋</button>'+
       '<button class="qb clear" data-a="clear" aria-label="Zerar">✕</button></div>':'')+
     '<div class="files">'+p.files.map(function(f,i){
