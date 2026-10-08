@@ -16,34 +16,34 @@
   :root{
     --bg:#f3f4f7; --surface:#ffffff; --surface-2:#eceef3; --ink:#1c2230; --soft:#5b6680;
     --line:#dfe3ec; --accent:#e8264f; --accent-ink:#ffffff; --teal:#0f9b93; --teal-soft:#e3f5f3;
-    --warn:#b26a00; --warn-soft:#fdf1dd; --danger:#c62828; --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 14px rgba(20,30,50,.06);
+    --teal-ink:#ffffff; --warn:#b26a00; --warn-soft:#fdf1dd; --danger:#c62828; --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 14px rgba(20,30,50,.06);
     color-scheme: light;
   }
   :root:not([data-theme="light"]){ @media (prefers-color-scheme: dark){
     --bg:#0f1218; --surface:#181d27; --surface-2:#222939; --ink:#eef1f7; --soft:#9aa6c0;
     --line:#2a3245; --accent:#ff5c7f; --accent-ink:#1a0a10; --teal:#4fd6cd; --teal-soft:#10302e;
-    --warn:#f0b24a; --warn-soft:#33281a; --danger:#ff7b7b; --shadow:none;
+    --teal-ink:#04201e; --warn:#f0b24a; --warn-soft:#33281a; --danger:#ff7b7b; --shadow:none;
     color-scheme: dark;
   }}
   :root[data-theme="dark"]{
     --bg:#0f1218; --surface:#181d27; --surface-2:#222939; --ink:#eef1f7; --soft:#9aa6c0;
     --line:#2a3245; --accent:#ff5c7f; --accent-ink:#1a0a10; --teal:#4fd6cd; --teal-soft:#10302e;
-    --warn:#f0b24a; --warn-soft:#33281a; --danger:#ff7b7b; --shadow:none;
+    --teal-ink:#04201e; --warn:#f0b24a; --warn-soft:#33281a; --danger:#ff7b7b; --shadow:none;
     color-scheme: dark;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-  html,body{margin:0; width:100%; max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%}
+  html,body{margin:0; width:100%; max-width:100%; -webkit-text-size-adjust:100%}
   body{background:var(--bg); color:var(--ink);
     font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     padding-inline:16px; padding-block:0 120px; min-height:100%;}
   button,input,select{font:inherit; color:inherit}
   button{cursor:pointer}
-  .wrap{width:100%; max-width:720px; margin:0 auto; min-width:0}
+  .wrap{width:100%; max-width:720px; margin:0 auto; min-width:0; overflow-x:clip}
   .wrap *{min-width:0}
 
   /* Header */
-  header{position:sticky; top:env(safe-area-inset-top,0px); z-index:10; background:var(--bg);
-    padding-block:12px 8px; display:flex; flex-direction:column; gap:10px}
+  .topbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:10; background:var(--bg);
+    padding-block:12px 10px; display:flex; flex-direction:column; gap:10px}
   .title-row{display:grid; grid-template-columns:34px minmax(0,1fr) auto auto auto; align-items:center; gap:8px}
   .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--accent));
     display:grid;place-items:center;color:#fff;font-weight:700}
@@ -55,9 +55,12 @@
   .tools{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px}
   .tools input[type=search]{width:100%; min-width:0; font-size:16px; padding:9px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface)}
   .tools select{max-width:150px; font-size:16px; padding:9px 8px; border-radius:12px; border:1px solid var(--line); background:var(--surface)}
-  .chips{display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:.85rem; color:var(--soft)}
-  .chip{border:1px solid var(--line); background:var(--surface); padding:6px 11px; border-radius:99px; font-size:.85rem}
-  .chip.on{background:var(--teal-soft); border-color:transparent; color:var(--teal)}
+  .chips{display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:.85rem; color:var(--soft); margin:2px 0 6px}
+  .chip{border:2px solid var(--soft); background:var(--surface); color:var(--ink); padding:9px 14px; border-radius:99px;
+    font-size:.92rem; font-weight:700}
+  .chip:active{transform:scale(.96)}
+  .chip.on{background:var(--teal); border-color:var(--teal); color:var(--teal-ink)}
+  #chipAll{border-color:var(--accent); color:var(--accent)}
   .summary{margin-left:auto}
 
   /* Cards */
@@ -146,7 +149,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <div class="topbar">
     <div class="title-row">
       <div class="logo">▶</div>
       <h1>Vídeos prontos</h1>
@@ -159,8 +162,10 @@
       <select id="sort" aria-label="Ordenar">
         <option value="name">Nome (A–Z)</option>
         <option value="count">Mais vídeos</option>
+        <option value="few">Menos vídeos</option>
         <option value="old">Mais antigo</option>
       </select>
+    </div>
     </div>
     <div class="chips">
       <button class="chip on" id="chipHide">Ocultar vazios</button>
@@ -168,7 +173,6 @@
       <button class="chip" id="chipClear">Limpar</button>
       <span class="summary" id="summary"></span>
     </div>
-  </header>
 
   <main>
     <div id="state"></div>
@@ -321,6 +325,7 @@ function visible(){
   });
   arr.sort(function(a,b){
     if(ui.sort==='name') return a.name.localeCompare(b.name,'pt-BR');
+    if(ui.sort==='few') return (a.files.length-b.files.length)||a.name.localeCompare(b.name,'pt-BR');
     if(ui.sort==='old'){ var x=a.files[0]?a.files[0].createdTime:'9'; var y=b.files[0]?b.files[0].createdTime:'9'; return x.localeCompare(y); }
     return (b.files.length-a.files.length)||a.name.localeCompare(b.name,'pt-BR');
   });
