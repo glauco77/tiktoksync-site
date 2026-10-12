@@ -465,19 +465,32 @@ function openNewProduct(){
     '<label for="np_name">Nome do produto</label><input type="text" id="np_name" placeholder="Ex.: Protetor Solar com Cor">'+
     '<div id="np_msg" class="help"></div><div class="row"><button class="btn ghost" id="np_c">Cancelar</button><button class="btn" id="np_ok">Criar</button></div>');
   $('np_c').onclick=closeSheet;
+  var _npCreating=false;
   $('np_ok').onclick=async function(){
-    var name=$('np_name').value.trim(); if(!name) return; var m=$('np_msg'); m.textContent='Criando…';
+    if(_npCreating) return;
+    var name=$('np_name').value.trim(); if(!name) return;
+    var m=$('np_msg'); var btn=$('np_ok'); var btnC=$('np_c');
+    _npCreating=true; btn.disabled=true; btn.textContent='Criando…'; btnC.disabled=true;
+    m.textContent='';
     try{
-      if(DEMO){ await sleep(400); m.innerHTML='<span class="ok">Criado (demonstração).</span>'; return; }
-      var ex=await listAll("'"+qEsc(cfg.rootId)+"' in parents and name='"+qEsc(name)+"' and mimeType='"+FOLDER+"' and trashed=false",'id');
+      if(DEMO){ await sleep(400); m.innerHTML='<span class=”ok”>Criado (demonstração).</span>'; return; }
+      var ex=await listAll(“'”+qEsc(cfg.rootId)+”' in parents and name='”+qEsc(name)+”' and mimeType='”+FOLDER+”' and trashed=false”,'id');
       var prod=ex[0]||await api('POST','files',{fields:'id'},{name:name,mimeType:FOLDER,parents:[cfg.rootId]});
       var subs=cfg.categories.concat([cfg.prontoName,cfg.archiveName]);
+      var criadas=[];
       for(var i=0;i<subs.length;i++){
-        var has=await listAll("'"+prod.id+"' in parents and name='"+qEsc(subs[i])+"' and mimeType='"+FOLDER+"' and trashed=false",'id');
-        if(!has.length) await api('POST','files',{fields:'id'},{name:subs[i],mimeType:FOLDER,parents:[prod.id]});
+        var has=await listAll(“'”+prod.id+”' in parents and name='”+qEsc(subs[i])+”' and mimeType='”+FOLDER+”' and trashed=false”,'id');
+        if(!has.length){ await api('POST','files',{fields:'id'},{name:subs[i],mimeType:FOLDER,parents:[prod.id]}); criadas.push(subs[i]); }
       }
-      m.innerHTML='<span class="ok">Produto “'+esc(name)+'” pronto ✔</span>'; setTimeout(function(){closeSheet(); refresh(true);},800);
-    }catch(e){ m.innerHTML='<span class="err">Erro: '+esc(e.message)+'</span>'; }
+      var msg=ex[0]
+        ? (criadas.length ? 'Subpastas criadas: '+esc(criadas.join(', '))+' ✔' : 'Produto já existia com todas as subpastas.')
+        : 'Produto “'+esc(name)+'” criado ✔';
+      m.innerHTML='<span class=”ok”>'+msg+'</span>';
+      setTimeout(function(){closeSheet(); refresh(true);},1200);
+    }catch(e){
+      m.innerHTML='<span class=”err”>Erro: '+esc(e.message)+'</span>';
+      btn.disabled=false; btn.textContent='Criar'; btnC.disabled=false; _npCreating=false;
+    }
   };
 }
 
