@@ -342,7 +342,7 @@ function render(){
   $('summary').textContent=products.length?(total+' pronto'+(total===1?'':'s')+' em '+products.filter(function(p){return p.files.length;}).length+' pasta(s)'):'';
   arr.forEach(function(p){ list.appendChild(cardEl(p)); });
   if(products.length && !arr.length){
-    $('state').innerHTML='<div class="note"><h3>Nenhuma pasta para mostrar</h3>'+(ui.hide?'Todas as pastas estão vazias ou o filtro não encontrou nada. Toque em “Ocultar vazios” para ver todas.':'Nada encontrado para essa busca.')+'</div>';
+    $('state').innerHTML='<div class="note"><h3>Nenhuma pasta para mostrar</h3>'+(ui.hide?'Todas as pastas estão vazias ou o filtro não encontrou nada. Toque em "Ocultar vazios" para ver todas.':'Nada encontrado para essa busca.')+'</div>';
   } else if(products.length){ $('state').innerHTML=''; }
   updateBar();
 }
@@ -473,22 +473,22 @@ function openNewProduct(){
     _npCreating=true; btn.disabled=true; btn.textContent='Criando…'; btnC.disabled=true;
     m.textContent='';
     try{
-      if(DEMO){ await sleep(400); m.innerHTML='<span class=”ok”>Criado (demonstração).</span>'; return; }
-      var ex=await listAll(“'”+qEsc(cfg.rootId)+”' in parents and name='”+qEsc(name)+”' and mimeType='”+FOLDER+”' and trashed=false”,'id');
+      if(DEMO){ await sleep(400); m.innerHTML='<span class="ok">Criado (demonstração).</span>'; return; }
+      var ex=await listAll("'"+qEsc(cfg.rootId)+"' in parents and name='"+qEsc(name)+"' and mimeType='"+FOLDER+"' and trashed=false",'id');
       var prod=ex[0]||await api('POST','files',{fields:'id'},{name:name,mimeType:FOLDER,parents:[cfg.rootId]});
       var subs=cfg.categories.concat([cfg.prontoName,cfg.archiveName]);
       var criadas=[];
       for(var i=0;i<subs.length;i++){
-        var has=await listAll(“'”+prod.id+”' in parents and name='”+qEsc(subs[i])+”' and mimeType='”+FOLDER+”' and trashed=false”,'id');
+        var has=await listAll("'"+prod.id+"' in parents and name='"+qEsc(subs[i])+"' and mimeType='"+FOLDER+"' and trashed=false",'id');
         if(!has.length){ await api('POST','files',{fields:'id'},{name:subs[i],mimeType:FOLDER,parents:[prod.id]}); criadas.push(subs[i]); }
       }
       var msg=ex[0]
         ? (criadas.length ? 'Subpastas criadas: '+esc(criadas.join(', '))+' ✔' : 'Produto já existia com todas as subpastas.')
-        : 'Produto “'+esc(name)+'” criado ✔';
-      m.innerHTML='<span class=”ok”>'+msg+'</span>';
+        : 'Produto "'+esc(name)+'" criado ✔';
+      m.innerHTML='<span class="ok">'+msg+'</span>';
       setTimeout(function(){closeSheet(); refresh(true);},1200);
     }catch(e){
-      m.innerHTML='<span class=”err”>Erro: '+esc(e.message)+'</span>';
+      m.innerHTML='<span class="err">Erro: '+esc(e.message)+'</span>';
       btn.disabled=false; btn.textContent='Criar'; btnC.disabled=false; _npCreating=false;
     }
   };
@@ -598,7 +598,7 @@ async function startDownload(){
     // Aguarda o toque do usuário (necessário para abrir a folha de compartilhar do iOS).
     var saveRes=await new Promise(function(resolve){
       $('d_title').textContent='Pronto para salvar ('+files.length+')';
-      $('d_sub').textContent='Toque em “Salvar na galeria” e depois em “Salvar '+files.length+' vídeo'+(files.length===1?'':'s')+'”.';
+      $('d_sub').textContent='Toque em "Salvar na galeria" e depois em "Salvar '+files.length+' vídeo'+(files.length===1?'':'s')+'".';
       $('d_row').innerHTML='<button class="btn ghost" id="d_skip">Pular lote</button><button class="btn" id="d_save">Salvar na galeria</button>';
       $('d_skip').onclick=function(){ resolve('skip'); };
       $('d_save').onclick=async function(){
@@ -620,7 +620,7 @@ async function startDownload(){
         catch(e){ log('Salvo, mas não consegui arquivar '+esc(ok[k].f.name)+': '+esc(e.message),'err'); }
       }
       log('✔ Lote '+(bi+1)+' salvo e arquivado','ok');
-    } else { log('Lote '+(bi+1)+' pulado (continua em “'+esc(cfg.prontoName)+'”)'); }
+    } else { log('Lote '+(bi+1)+' pulado (continua em "'+esc(cfg.prontoName)+'")'); }
     files=null;
   }
 
@@ -633,7 +633,7 @@ async function startDownload(){
   if($('d_undo')) $('d_undo').onclick=async function(){
     this.disabled=true; this.textContent='Desfazendo…';
     for(var u=0;u<saved.length;u++){ try{ await unarchiveFile(saved[u]); }catch(e){} }
-    closeSheet(); toast('Vídeos devolvidos para “'+cfg.prontoName+'”'); qty={}; BUSY=false; refresh(true);
+    closeSheet(); toast('Vídeos devolvidos para "'+cfg.prontoName+'"'); qty={}; BUSY=false; refresh(true);
   };
   $('d_close').onclick=function(){ closeSheet(); qty={}; BUSY=false; refresh(true); };
 }
@@ -652,7 +652,7 @@ async function refresh(manual){
     products=await loadData();
     Object.keys(qty).forEach(function(id){ if(!products.some(function(p){return p.id===id;})) delete qty[id]; });
     st.innerHTML=''; render();
-    if(!products.length) st.innerHTML='<div class="note"><h3>Nenhuma pasta “'+esc(cfg.prontoName)+'” encontrada</h3>Confira o link da pasta raiz e o nome da subpasta nas Configurações.</div>';
+    if(!products.length) st.innerHTML='<div class="note"><h3>Nenhuma pasta "'+esc(cfg.prontoName)+'" encontrada</h3>Confira o link da pasta raiz e o nome da subpasta nas Configurações.</div>';
     purgeArchived(false).catch(function(){});   // limpeza diária silenciosa
   }catch(e){
     $('list').innerHTML='';
